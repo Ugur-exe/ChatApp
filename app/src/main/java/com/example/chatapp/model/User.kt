@@ -5,5 +5,6 @@ data class User(
     val nameSurname: String = "",
     val email: String = "",
     val profileImageUrl: String = "",
-    val status: String = "offline" // Kullanıcının online durumu
+    val status: String = "offline", // Kullanıcının online durumu
+    val lastMessageModel: List<ChatModel>?=null
 )

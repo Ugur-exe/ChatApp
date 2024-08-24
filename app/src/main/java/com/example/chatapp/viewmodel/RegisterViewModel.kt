@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.example.chatapp.model.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
@@ -37,22 +38,29 @@ class RegisterViewModel(application: Application):AndroidViewModel(application) 
     }
     private fun saveUserToFirestore(email: String, fullName: String) {
         val userId = auth.currentUser?.uid
-        val userMap = hashMapOf(
-            "userId" to userId,
-            "email" to email,
-            "nameSurname" to fullName
-        )
+        val userMap = userId?.let {
+            User(
+                userId = it,
+                email = email,
+                nameSurname = fullName,
+                profileImageUrl = "", // Varsayılan olarak boş bırakabilirsiniz ya da bir URL belirleyebilirsiniz
+                status = "offline", // Varsayılan olarak 'offline' belirleyebilirsiniz
+                lastMessageModel = emptyList() // Varsayılan olarak boş liste belirleyebilirsiniz
+            )
+        }
 
         userId?.let {
-            firestore.collection("users").document(it)
-                .set(userMap)
-                .addOnSuccessListener {
-                    Toast.makeText(getApplication(), "User saved to Firestore successfully!", Toast.LENGTH_SHORT).show()
-                }
-                .addOnFailureListener { e ->
-                    // Kayıt başarısız, hata mesajı göster
-                    Toast.makeText(getApplication(), "Failed to save user: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
-                }
+            if (userMap != null) {
+                firestore.collection("users").document(it)
+                    .set(userMap)
+                    .addOnSuccessListener {
+                        Toast.makeText(getApplication(), "User saved to Firestore successfully!", Toast.LENGTH_SHORT).show()
+                    }
+                    .addOnFailureListener { e ->
+                        // Kayıt başarısız, hata mesajı göster
+                        Toast.makeText(getApplication(), "Failed to save user: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                    }
+            }
         }
     }
 

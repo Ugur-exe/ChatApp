@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.chatapp.R
 import com.example.chatapp.adapter.ChatPageAdapter
@@ -47,21 +48,37 @@ class MainFragment : Fragment() {
         viewModel=ViewModelProvider(this)[MainViewModel::class.java]
         val currentUser = auth.currentUser?.uid.toString()
         viewModel.loadUsers(currentUser)
-        viewModel.users.observe(viewLifecycleOwner, Observer { userList ->
-            val adapter=MainPageAdapter(userList)
-            binding.mainRecyclerView.layoutManager = LinearLayoutManager(context)
-            binding.mainRecyclerView.adapter=adapter
-        })
+        binding.currentUserName.text=auth.currentUser?.email.toString()
+
+
+        try {
+            viewModel.users.observe(viewLifecycleOwner, Observer { userList ->
+                viewModel.chatModel.observe(viewLifecycleOwner, Observer { chatList ->
+
+                    val adapter=MainPageAdapter(userList,chatList)
+
+
+                    binding.mainRecyclerView.layoutManager = LinearLayoutManager(context)
+                    binding.mainRecyclerView.adapter=adapter
+                })
+            })
+        }catch (e:Exception){
+
+            println("MainFragment: ${e.localizedMessage}")
+        }
 
         binding.imageButton2.setOnClickListener{
-            val currentUser = auth.currentUser
+             val currentUser = auth.currentUser
             if (currentUser != null) {
                 val userRef = FirebaseFirestore.getInstance().collection("users").document(currentUser.uid.toString())
                 userRef.update("status", "offline")
             }
             auth.signOut()
+
             val action=MainFragmentDirections.actionMainFragmentToLoginFragment()
+
             Navigation.findNavController(it).navigate(action)
+
         }
 
     }

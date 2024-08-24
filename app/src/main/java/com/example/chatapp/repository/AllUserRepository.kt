@@ -13,7 +13,7 @@ class AllUserRepository :AllUserGetService {
     ) {
         firestore.collection("users")
             .whereNotEqualTo("userId", chatId)
-            .addSnapshotListener { result, exception ->
+            .addSnapshotListener() { result, exception ->
                 if (exception != null) {
                     // Handle any errors
                     return@addSnapshotListener
@@ -22,6 +22,7 @@ class AllUserRepository :AllUserGetService {
                     document.toObject(User::class.java)
                 } ?: emptyList()
                 onSuccess(userList)
+
             }
 
     }

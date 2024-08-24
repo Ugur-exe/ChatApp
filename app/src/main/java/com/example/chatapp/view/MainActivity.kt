@@ -7,7 +7,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.chatapp.R
 import com.example.chatapp.databinding.ActivityMainBinding
-import com.example.chatapp.service.UserStatus
+import com.example.chatapp.repository.UserStatus
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -30,7 +30,9 @@ class MainActivity : AppCompatActivity() {
 
         val userStatusObserver = UserStatus { status ->
             statusUpdate(status)
+            println("Görülen saat : $status")
         }
+
 
         // LifecycleOwner'a observer'ı ekleyin
         lifecycle.addObserver(userStatusObserver)

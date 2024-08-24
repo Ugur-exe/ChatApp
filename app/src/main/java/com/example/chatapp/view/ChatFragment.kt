@@ -9,13 +9,11 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.chatapp.adapter.ChatPageAdapter
 import com.example.chatapp.databinding.FragmentChatBinding
-import com.example.chatapp.model.ChatMessageModel
-import com.example.chatapp.service.UserStatusGet
+import com.example.chatapp.repository.UserStatusGet
 import com.example.chatapp.viewmodel.ChatViewModel
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
-import java.util.UUID
 
 class ChatFragment : Fragment() {
 

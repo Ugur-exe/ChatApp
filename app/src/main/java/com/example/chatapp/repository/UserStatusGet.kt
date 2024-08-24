@@ -1,4 +1,4 @@
-package com.example.chatapp.service
+package com.example.chatapp.repository
 
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LiveData

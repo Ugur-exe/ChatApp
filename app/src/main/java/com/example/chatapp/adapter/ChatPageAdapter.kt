@@ -25,20 +25,21 @@ class ChatPageAdapter(private var list:List<ChatMessageModel>,private val curren
     override fun onBindViewHolder(holder: ChatPageViewHolder, position: Int) {
         val message = list[position]
         holder.binding.messageText.text=list[position].messageText
+        holder.binding.messageTimestampChat.text=list[position].timestamp
         if (message.senderId == currentUserId) {
             // Mesaj sağa hizalanır
-            val params = holder.binding.messageText.layoutParams as ConstraintLayout.LayoutParams
+            val params = holder.binding.chatBubble.layoutParams as ConstraintLayout.LayoutParams
             params.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
             params.startToStart = ConstraintLayout.LayoutParams.UNSET
-            holder.binding.messageText.layoutParams = params
-            holder.binding.messageText.setBackgroundResource(R.drawable.chat_bubble_right)
+            holder.binding.chatBubble.layoutParams = params
+            holder.binding.chatBubble.setBackgroundResource(R.drawable.chat_bubble_right)
         } else {
             // Mesaj sola hizalanır
-            val params = holder.binding.messageText.layoutParams as ConstraintLayout.LayoutParams
+            val params = holder.binding.chatBubble.layoutParams as ConstraintLayout.LayoutParams
             params.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
             params.endToEnd = ConstraintLayout.LayoutParams.UNSET
-            holder.binding.messageText.layoutParams = params
-            holder.binding.messageText.setBackgroundResource(R.drawable.chat_bubble_left)
+            holder.binding.chatBubble.layoutParams = params
+            holder.binding.chatBubble.setBackgroundResource(R.drawable.chat_bubble_left)
         }
     }
 }

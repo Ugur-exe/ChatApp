@@ -8,15 +8,18 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.Navigation
 import com.example.chatapp.model.ChatMessageModel
+import com.example.chatapp.model.ChatModel
 import com.example.chatapp.repository.ChatFirebaseRepository
-import com.example.chatapp.repository.ChatRepository
+import com.example.chatapp.repository.LocalGetDateTime
 import com.example.chatapp.view.ChatFragmentDirections
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 class ChatViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val chatRepository: ChatFirebaseRepository = ChatFirebaseRepository() // veya ChatApiRepository()
+    private val chatRepository: ChatFirebaseRepository = ChatFirebaseRepository()
+    private val dateTime:LocalGetDateTime=LocalGetDateTime()
 
     private val _messages = MutableLiveData<List<ChatMessageModel>>()
     val messages: LiveData<List<ChatMessageModel>> get() = _messages
@@ -32,20 +35,34 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
 
     fun sendMessage(senderId: String, receiverId: String, messageText: String) {
         val chatId = getChatId(senderId, receiverId)
+        val timestamp =dateTime.getDateTime()
+
+        // Yeni mesaj modeli oluşturuluyor
         val message = ChatMessageModel(
-            messageId = 0,
+            messageId = 0,  // Otomatik oluşturulacaksa 0 verilebilir
             chatId = chatId,
             senderId = senderId,
             messageText = messageText,
-            timestamp = System.currentTimeMillis().toString(),
+            timestamp = timestamp,
             isSeen = false,
             receiverId = receiverId
         )
 
-        chatRepository.sendMessage(chatId, message, {
+        // Sohbet modeli güncelleniyor
+        val chatModel = ChatModel(
+            chatId = chatId,
+            receiverId = receiverId,
+            senderId = senderId,
+            lastMessage = messageText,
+            lastMessageTimestamp = timestamp,
+            isGroupChat = false
+        )
+
+        chatRepository.sendMessage(chatId, chatModel, message, {
             // Mesaj başarıyla gönderildi
+            listenForMessages(senderId, receiverId)  // Mesajları dinlemeye devam et
         }, { error ->
-            error.printStackTrace()
+            println(error.localizedMessage)
         })
     }
 
@@ -55,7 +72,6 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun backToMain(view: View) {
-        val action = ChatFragmentDirections.actionChatFragmentToMainFragment()
-        Navigation.findNavController(view).navigate(action)
+        Navigation.findNavController(view).popBackStack()
     }
 }
